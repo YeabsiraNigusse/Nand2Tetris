@@ -1,0 +1,39 @@
+// ALU.hdl -- canonical nand2tetris implementation
+CHIP ALU {
+    IN  
+        x[16], y[16],        
+        zx, nx, zy, ny, f, no;
+    OUT 
+        out[16],
+        zr,
+        ng;
+
+    PARTS:
+    // prepare x
+    Mux16(a=x, b=false, sel=zx, out=xx1);
+    Not16(in=xx1, out=xx1not);
+    Mux16(a=xx1, b=xx1not, sel=nx, out=xx);
+
+    // prepare y
+    Mux16(a=y, b=false, sel=zy, out=yy1);
+    Not16(in=yy1, out=yy1not);
+    Mux16(a=yy1, b=yy1not, sel=ny, out=yy);
+
+    // function: add or and
+    Add16(a=xx, b=yy, out=addOut);
+    And16(a=xx, b=yy, out=andOut);
+    Mux16(a=andOut, b=addOut, sel=f, out=preNo);
+
+    // optional negate output
+    Not16(in=preNo, out=preNonot);
+    Mux16(a=preNo, b=preNonot, sel=no, out=out);
+
+    // zr (zero) flag: zr = 1 iff all bits of out are 0
+    Or8Way(in=out[0..7], out=orlo);
+    Or8Way(in=out[8..15], out=orhi);
+    Or(a=orlo, b=orhi, out=anyBitIsOne);
+    Not(in=anyBitIsOne, out=zr);
+
+    // ng (negative) flag: ng = out[15] (sign bit)
+    Or(a=out[15], b=false, out=ng);
+}

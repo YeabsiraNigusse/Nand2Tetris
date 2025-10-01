@@ -1,0 +1,12 @@
+// IsZero.hdl
+// Returns zr=1 iff in == 0
+CHIP IsZero {
+    IN  in[16];
+    OUT zr;
+
+    PARTS:
+    Or8Way(in=in[0..7],  out=or_lo);
+    Or8Way(in=in[8..15], out=or_hi);
+    Or(a=or_lo, b=or_hi, out=anyBitIsOne);
+    Not(in=anyBitIsOne, out=zr);
+}
