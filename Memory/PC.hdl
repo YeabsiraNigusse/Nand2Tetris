@@ -1,0 +1,41 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/3/a/PC.hdl
+/**
+ * A 16-bit counter.
+ * if      reset(t): out(t+1) = 0
+ * else if load(t):  out(t+1) = in(t)
+ * else if inc(t):   out(t+1) = out(t) + 1
+ * else              out(t+1) = out(t)
+ */
+CHIP PC {
+    IN in[16], reset, load, inc;
+    OUT out[16];
+
+    PARTS:
+    // Internal register output (do NOT use chip 'out' as an internal input)
+    // 1) compute regOut + 1
+    Inc16(in=regOut, out=incOut);
+
+    // 2) if inc then use incOut else use regOut
+    Mux16(a=regOut, b=incOut, sel=inc, out=incOrRegOut);
+
+    // 3) if load then use 'in' else use incOrRegOut
+    Mux16(a=incOrRegOut, b=in, sel=load, out=maybeLoad);
+
+    // 4) if reset then 0 else use maybeLoad
+    // Correct ordering: when reset=1 pick 'false' (0).
+    Mux16(a=maybeLoad, b=false, sel=reset, out=next);
+
+    // 5) load the register when any control is asserted
+    Or(a=reset, b=load, out=rorl);
+    Or(a=rorl, b=inc, out=loadReg);
+
+    // 6) store into internal net regOut (NOT the chip output)
+    Register(in=next, load=loadReg, out=regOut);
+
+    // 7) drive the chip 'out' from regOut only (double inversion buffer)
+    Not16(in=regOut, out=tmp);
+    Not16(in=tmp, out=out);
+}
