@@ -8,3 +8,5 @@
 - this takes only addition opration which make 2-complement method powerfull and easy(interesting finding).
 
 ``` The breakthrough was realizing that arithmetic itself can be built entirely from logical operations. Once Boolean logic was shown to implement addition and other math, it merged abstract mathematics with physical logic gates — making it possible to construct full arithmetic units in hardware.```
+
+
